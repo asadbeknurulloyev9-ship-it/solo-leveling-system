@@ -3,198 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solo Leveling System v16.0</title>
+    <title>Aqlli Sug'orish Tizimi (MVP)</title>
     <style>
-        body { background-color: #0b0f19; color: #ffffff; font-family: Arial, sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .system-box { border: 2px solid #00d2ff; background: rgba(0, 210, 255, 0.05); border-radius: 10px; padding: 20px; width: 90%; max-width: 450px; text-align: center; margin-bottom: 20px; }
-        h1 { color: #00d2ff; text-transform: uppercase; margin-bottom: 5px; font-size: 24px; }
-        .rank { color: #ff3e3e; font-weight: bold; font-size: 18px; margin-bottom: 5px; }
-        .title-badge { color: #ffaa00; font-weight: bold; font-size: 14px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .timer-box { background: #111827; border: 1px solid #ff3e3e; color: #ff3e3e; font-size: 22px; padding: 10px; margin-bottom: 15px; font-family: monospace; font-weight: bold; }
-        .quest-title { background: #00d2ff; color: #0b0f19; padding: 5px 10px; font-weight: bold; display: inline-block; margin-bottom: 15px; text-transform: uppercase; }
-        .water-box { border-color: #00a2ff; background: rgba(0, 162, 255, 0.05); }
-        .challenge-box { border-color: #ffaa00; background: rgba(255, 170, 0, 0.05); display: none; }
-        .stat-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); margin: 5px 0; padding: 10px; border-radius: 4px; border-left: 3px solid #ffaa00; }
-        .stat-btn { background: #ffaa00; color: #0b0f19; border: none; padding: 5px 15px; font-weight: bold; cursor: pointer; border-radius: 3px; font-size: 16px; }
-        .task-list { text-align: left; margin-bottom: 20px; }
-        .task-item { background: rgba(255, 255, 255, 0.05); margin: 10px 0; padding: 12px; border-left: 4px solid #00d2ff; display: flex; align-items: center; border-radius: 4px; }
-        .task-item input { margin-right: 15px; transform: scale(1.3); }
-        .btn { background: #00d2ff; color: #0b0b1a; border: none; padding: 12px 25px; font-weight: bold; text-transform: uppercase; cursor: pointer; width: 100%; border-radius: 5px; font-size: 16px; }
-        .water-btn { background: #00a2ff; color: #fff; margin-top: 10px; }
-        .notify-btn { background: #00ff66; color: #0b0f19; margin-bottom: 15px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #f0f4f8; color: #333; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { background: #2e7d32; color: white; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 20px; }
+        
+        /* IP Sozlamalari */
+        .ip-panel { background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 10px; align-items: center; }
+        .ip-panel input { padding: 8px; border: 1px solid #ccc; border-radius: 5px; flex-grow: 1; }
+        
+        /* Dashboard dizayni */
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
+        .card h3 { color: #555; margin-bottom: 10px; }
+        .value { font-size: 2rem; font-weight: bold; color: #2e7d32; margin-bottom: 10px; }
+        
+        /* Nasos boshqaruvi */
+        .btn { padding: 12px 30px; font-size: 1.1rem; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; width: 100%; transition: 0.3s; }
+        .btn-on { background-color: #2e7d32; }
+        .btn-on:hover { background-color: #1b5e20; }
+        .btn-off { background-color: #c62828; }
+        .btn-off:hover { background-color: #b71c1c; }
+        
+        /* Tavsiyalar paneli */
+        .recommendation { background: #e8f5e9; border-left: 5px solid #2e7d32; padding: 15px; border-radius: 5px; margin-top: 20px; }
+        .recommendation h4 { color: #1b5e20; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
-    <button class="btn notify-btn" id="notifBtn" onclick="requestNotification()">🔔 BILDORISHNOMALARNI YOQISH</button>
+<div class="container">
+    <header>
+        <h1>SmartAgro - Sug'orish Boshqaruv Paneli</h1>
+        <p>Datchiklar monitoringi va avtomatlashtirilgan tizim (MVP)</p>
+    </header>
 
-    <!-- 1-BLOK: MASHQLAR RO'YXATI -->
-    <div class="system-box">
-        <h1>[ TIZIM FAOL ]</h1>
-        <div class="rank">LEVEL 1 (C-DARAJALI OVCHI)</div>
-        <div class="title-badge" id="titleDisplay">TITUL: YANGI OVCHI</div>
-        
-        <div class="timer-box" id="timeDisplay">Hozirgi vaqt: 00:00:00</div>
-        <div style="color: #ff3e3e; font-size: 12px; margin-bottom: 15px; font-weight: bold;">MUDDAT: ERTALAB SOAT 06:30 GACHA</div>
-        
-        <div class="quest-title">Kundalik Topshiriq: Kuchayish</div>
-        
-        <div class="task-list">
-            <div class="task-item"><input type="checkbox" id="t1"><label for="t1">Yugurish (3 KM)</label></div>
-            <div class="task-item"><input type="checkbox" id="t2"><label for="t2">Otjimaniya (30 ta) -> KUCH</label></div>
-            <div class="task-item"><input type="checkbox" id="t3"><label for="t3">Press mashqi (30 ta) -> CHIDAMLILIK</label></div>
-            <div class="task-item"><input type="checkbox" id="t4"><label for="t4">Prisidaniya (35 ta) -> ASOS</label></div>
+    <!-- Datchik IP manzilini kiritish joyi -->
+    <div class="ip-panel">
+        <label><strong>Datchik (ESP32) IP manzili:</strong></label>
+        <input type="text" id="deviceIp" value="112.168.1.100" placeholder="Masalan: 192.168.1.100">
+    </div>
+
+    <div class="dashboard">
+        <!-- Tuproq namligi kartasi -->
+        <div class="card">
+            <h3>Tuproq Namligi</h3>
+            <div class="value" id="moistureVal">35%</div>
+            <p>Xavfsiz me'yor: 40% - 70%</p>
         </div>
 
-        <button class="btn" onclick="checkQuest()">Topshiriqni Yakunlash</button>
-    </div>
-
-    <!-- QO'SHIMCHA VAZIFALAR (YASHIRIN MISSIYA) -->
-    <div class="system-box challenge-box" id="challengeBox">
-        <h1 style="color: #ffaa00;">[ YASHIRIN MISSIYA ]</h1>
-        <div class="quest-title" style="background:#ffaa00;">Aqliy va Strategik Rivojlanish</div>
-        <div class="task-list">
-            <div class="task-item" style="border-left-color: #ffaa00;"><input type="checkbox" id="c1"><label for="c1">20 daqiqa Foydali Kitob o'qish (AQLLILIK uchun)</label></div>
-            <div class="task-item" style="border-left-color: #ffaa00;"><input type="checkbox" id="c2"><label for="c2">15 ta yangi inglizcha so'z yodlash (SEZGIRLIK uchun)</label></div>
+        <!-- Havo harorati kartasi -->
+        <div class="card">
+            <h3>Havo Harorati</h3>
+            <div class="value" id="tempVal">32°C</div>
+            <p>Bug'lanish darajasi yuqori</p>
         </div>
-        <button class="btn" style="background:#ffaa00; color:#0b0f19;" onclick="checkChallenge()">Yashirin Missiyani Yakunlash</button>
-    </div>
 
-    <!-- 2-BLOK: SUV BALANSI -->
-    <div class="system-box water-box">
-        <h1 style="color: #00a2ff;">[ SUV BALANSI ]</h1>
-        <div style="color: #00a2ff; font-weight: bold; margin-bottom: 10px;" id="waterAlert">Eslatgichlar faol (Har juft soatda)</div>
-        <div class="task-list">
-            <div class="task-item" style="border-left-color: #00a2ff;"><input type="checkbox" id="w1"><label for="w1">08:00 — 1 stakan suv</label></div>
-            <div class="task-item" style="border-left-color: #00a2ff;"><input type="checkbox" id="w2"><label for="w2">10:00 — 1 stakan suv</label></div>
-            <div class="task-item" style="border-left-color: #00a2ff;"><input type="checkbox" id="w3"><label for="w3">12:00 — 1 stakan suv</label></div>
-            <div class="task-item" style="border-left-color: #00a2ff;"><input type="checkbox" id="w4"><label for="w4">14:00 — 1 stakan suv</label></div>
-            <div class="task-item" style="border-left-color: #00a2ff;"><input type="checkbox" id="w5"><label for="w5">16:00 — 1 stakan suv</label></div>
-            <div class="task-item" style="border-left-color: #00a2ff;"><input type="checkbox" id="w6"><label for="w6">18:00 — 1 stakan suv</label></div>
-            <div class="task-item" style="border-left-color: #00a2ff;"><input type="checkbox" id="w7"><label for="w7">20:00 — 1 stakan suv</label></div>
+        <!-- Nasos holati va boshqarish -->
+        <div class="card">
+            <h3>Suv Nasosi Holati</h3>
+            <div class="value" id="pumpStatus" style="color: #c62828;">O'CHIQ</div>
+            <button id="pumpBtn" class="btn btn-on" onclick="togglePump()">Nasosni Yoqish</button>
         </div>
-        <button class="btn water-btn" onclick="checkWater()">Suv Balansini Saqlash</button>
     </div>
 
-    <!-- 3-BLOK: KO'RSATKICHLAR (STATS) -->
-    <div class="system-box" style="border-color: #ffaa00;">
-        <h1 style="color: #ffaa00;">[ KO'RSATKICHLAR ]</h1>
-        <div style="color: #ffaa00; font-weight: bold; margin-bottom: 10px;" id="ptsText">Mavjud Mahorat Ballari: 0</div>
+    <!-- Dehqon uchun tavsiyalar -->
+    <div class="recommendation">
+        <h4>Agronom Tavsiyasi:</h4>
+        <p id="agroAdvice">Yuklanmoqda...</p>
+    </div>
+</div>
+
+<script>
+    // Haqiqiy datchikdan ma'lumot olish funksiyasi (Fetch API orqali)
+    async function updateDataFromSensor() {
+        const ip = document.getElementById('deviceIp').value;
         
-        <div class="stat-row"><span>💪 KUCH (Strength): <b id="s_str">10</b></span><button class="stat-btn" onclick="upStat('str')">+</button></div>
-        <div class="stat-row"><span>⚡ TEZLIK (Agility): <b id="s_agi">10</b></span><button class="stat-btn" onclick="upStat('agi')">+</button></div>
-        <div class="stat-row"><span>🔋 CHIDAMLILIK (Stamina): <b id="s_sta">10</b></span><button class="stat-btn" onclick="upStat('sta')">+</button></div>
-        <div class="stat-row"><span>🧠 AQLLILIK (Intelligence): <b id="s_int">10</b></span><button class="stat-btn" onclick="upStat('int')">+</button></div>
-        <div class="stat-row"><span>🔱 IRODA (Willpower): <b id="s_will">10</b></span><button class="stat-btn" onclick="upStat('will')">+</button></div>
-    </div>
-
-    <script>
-        let points = 0;
-        let stats = { str: 10, agi: 10, sta: 10, int: 10, will: 10 };
-        let totalEarnedPoints = 0;
-
-        setInterval(function() {
-            let d = new Date();
-            let h = d.getHours(); let m = d.getMinutes(); let s = d.getSeconds();
-            document.getElementById('timeDisplay').innerText = "Hozirgi vaqt: " + (h<10?"0"+h:h) + ":" + (m<10?"0"+m:m) + ":" + (s<10?"0"+s:s);
-
-            if ((h === 8 || h === 10 || h === 12 || h === 14 || h === 16 || h === 18 || h === 20) && m === 0 && s === 0) {
-                sendWaterNotification(h);
-            }
-        }, 1000);
-
-        function requestNotification() {
-            if ("Notification" in window) {
-                Notification.requestPermission().then(function(permission) {
-                    if (permission === "granted") {
-                        alert("Tizim bildirishnomalari muvaffaqiyatli yoqildi.");
-                        document.getElementById('notifBtn').style.display = 'none';
-                    }
-                });
-            }
-        }
-
-        function sendWaterNotification(hour) {
-            if (Notification.permission === "granted") {
-                new Notification("[ TIZIM BILDIRISHNOMASI ]", {
-                    body: "Soat " + hour + ":00 bo'ldi. Suv ichish va tiklanish vaqti!",
-                });
-            }
-            document.getElementById('waterAlert').innerText = "⚠️ DIQQAT! SUV ICHISH VAQTI!";
-        }
-
-        function updateTitleAndChallenges() {
-            let titleText = "YANGI OVCHI";
-            if (totalEarnedPoints >= 6 && totalEarnedPoints < 15) {
-                titleText = "CHAQQON BO'RI";
-            } else if (totalEarnedPoints >= 15) {
-                titleText = "SOYALAR HUKMDORI";
-            }
-            document.getElementById('titleDisplay').innerText = "TITUL: " + titleText;
-
-            if (totalEarnedPoints >= 6) {
-                document.getElementById('challengeBox').style.display = "block";
+        try {
+            // MVP sinov bosqichida xato bermasligi uchun quyidagi qatorlarni simulyatsiya qilamiz.
+            // Haqiqiy datchik ulanganda quyidagi izohdan (//) chiqariladi:
+            // const response = await fetch(`http://${ip}/status`);
+            // const data = await response.json();
+            
+            // Hozircha sinov uchun tasodifiy (simulyatsiya) ma'lumotlar:
+            let moisture = Math.floor(Math.random() * (75 - 25) + 25);
+            let temperature = Math.floor(Math.random() * (38 - 22) + 22);
+            
+            document.getElementById('moistureVal').innerText = moisture + "%";
+            document.getElementById('tempVal').innerText = temperature + "°C";
+            
+            // Aqlli tavsiya berish algoritmi
+            let advice = "";
+            if (moisture < 40) {
+                advice = "Diqqat! Tuproq namligi juda past. Suv nasosini yoqish tavsiya etiladi.";
+                // Avtomatik ochish funksiyasi (Agar namlik juda tushib ketsa)
+                autoTurnOnPump();
+            } else if (moisture >= 40 && moisture <= 70) {
+                advice = "Tuproq namligi me'yorda. Ekin hozircha sug'orishga muhtoj emas.";
             } else {
-                document.getElementById('challengeBox').style.display = "none";
+                advice = "Namlik juda yuqori! Nasosni zudlik bilan o'chiring, aks holda ildiz chirishi mumkin.";
             }
+            document.getElementById('agroAdvice').innerText = advice;
+
+        } catch (error) {
+            console.log("Datchik bilan aloqa o'rnatilmadi. IP manzilni tekshiring.");
         }
+    }
 
-        function upStat(type) {
-            if (points > 0) {
-                points--;
-                stats[type]++;
-                document.getElementById('s_' + type).innerText = stats[type];
-                document.getElementById('ptsText').innerText = "Mavjud Mahorat Ballari: " + points;
-            } else {
-                alert("Mahorat ballari yo'q!");
-            }
+    // Nasosni tugma orqali boshqarish (Saytdan datchikka buyruq yuborish)
+    async function togglePump() {
+        const ip = document.getElementById('deviceIp').value;
+        const btn = document.getElementById('pumpBtn');
+        const status = document.getElementById('pumpStatus');
+        
+        if (status.innerText === "O'CHIQ") {
+            // Datchikka yoqish buyrug'ini yuborish: fetch(`http://${ip}/pump/on`)
+            status.innerText = "YONIQ";
+            status.style.color = "#2e7d32";
+            btn.innerText = "Nasosni O'chirish";
+            btn.className = "btn btn-off";
+        } else {
+            // Datchikka o'chirish buyrug'ini yuborish: fetch(`http://${ip}/pump/off`)
+            status.innerText = "O'CHIQ";
+            status.style.color = "#c62828";
+            btn.innerText = "Nasosni Yoqish";
+            btn.className = "btn btn-on";
         }
+    }
 
-        function checkQuest() {
-            let c1 = document.getElementById('t1').checked;
-            let c2 = document.getElementById('t2').checked;
-            let c3 = document.getElementById('t3').checked;
-            let c4 = document.getElementById('t4').checked;
+    // Avtomatik yoqish funksiyasi
+    function autoTurnOnPump() {
+        const status = document.getElementById('pumpStatus');
+        const btn = document.getElementById('pumpBtn');
+        if (status.innerText === "O'CHIQ") {
+            status.innerText = "YONIQ (AVTO)";
+            status.style.color = "#2e7d32";
+            btn.innerText = "Nasosni O'chirish";
+            btn.className = "btn btn-off";
+            alert("Avtomatlashtirish tizimi: Tuproq qurib qolgani sababli nasos avtomatik ishga tushirildi!");
+        }
+    }
 
-if (c1 && c2 && c3 && c4) {
-points += 3;
-totalEarnedPoints += 3;
-document.getElementById('ptsText').innerText = "Mavjud Mahorat Ballari: " + points;
-updateTitleAndChallenges();
-alert("🔥 Kunlik missiya yakunlandi! +3 Mahorat balli berildi.");
-document.getElementById('t1').checked = false;
-document.getElementById('t2').checked = false;
-document.getElementById('t3').checked = false;
-document.getElementById('t4').checked = false;
-} else {
-alert("Hamma dars/mashqlarni belgilamadingiz!");
-}
-}
-function checkChallenge() {
-let ch1 = document.getElementById('c1').checked;
-let ch2 = document.getElementById('c2').checked;
-if (ch1 && ch2) {
-points += 2;
-totalEarnedPoints += 2;
-document.getElementById('ptsText').innerText = "Mavjud Mahorat Ballari: " + points;
-updateTitleAndChallenges();
-alert("🔱 Yashirin Missiya bajarildi! Sizga qo'shimcha +2 Mahorat balli taqdim etildi!");
-document.getElementById('c1').checked = false;
-document.getElementById('c2').checked = false;
-} else {
-alert("Yashirin missiya topshiriqlari hali to'liq bajarilmadi!");
-}
-}
-function checkWater() {
-let wChecked = 0;
-for(let i=1; i<=7; i++) {
-if(document.getElementById('w'+i).checked) wChecked++;
-}
-alert("Bugun " + wChecked + " stakan suv ichdingiz. Maqsad: 7 stakan!");
-}
-if (Notification.permission === "granted") {
-document.getElementById('notifBtn').style.display = 'none';
-}
+    // Har 5 soniyada datchik ma'lumotlarini yangilab turish
+    setInterval(updateDataFromSensor, 5000);
+    // Sayt ochilishi bilan bir marta ishga tushirish
+    updateDataFromSensor();
 </script>
+
 </body>
 </html>
